@@ -21,17 +21,29 @@ class MyApp extends StatelessWidget {
         onWebResourceError: (WebResourceError error) {},
       ),
     )
-    ..loadRequest(Uri.parse('https://teaalem.com/'));
+    ..loadRequest(Uri.parse('https://teaalem.com'));
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Teaalem',
-      home: Scaffold(
-          body: SafeArea(
-        child: WebViewWidget(controller: controller),
-      )),
+      home: WillPopScope(
+        onWillPop: () => _exitApp(context),
+        child: Scaffold(
+            body: SafeArea(
+          child: WebViewWidget(controller: controller),
+        )),
+      ),
     );
+  }
+
+  Future<bool> _exitApp(BuildContext context) async {
+    if (await controller.canGoBack()) {
+      controller.goBack();
+      return Future.value(false);
+    } else {
+      return Future.value(true);
+    }
   }
 }
